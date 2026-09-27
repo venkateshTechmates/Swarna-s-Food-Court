@@ -46,9 +46,13 @@ Edit the `MENU` array in the same `<script>`. Each dish is one line:
 
 - `price` is in rupees.
 - `veg: true` shows the green vegetarian mark; `false` shows the non-veg mark.
-- `img` picks the plate artwork: biryani, friedrice_c, friedrice_v, noodles_c, noodles_v, manchuria, chicken65, kebab, pakodi, fish, boneless, roti.
-- To show a real photo, upload it to an `images/` folder and add `photo: "images/biryani.jpg"` to the dish.
+- `img` picks the dish photo from the `images/` folder: biryani, friedrice_c, friedrice_v, noodles_c, noodles_v, manchuria, chicken65, kebab, pakodi, fish, boneless, roti.
+- To use a different photo, upload it to `images/` and add `photo: "images/my-photo.jpg"` to the dish.
 - To add a category, add a new `{ name: "…", items: [ … ] }` block.
+
+## Photos
+
+The dish photos in `images/` were cropped from the shop's two posters. `images/banner.jpg` is the preview picture shown when the link is shared on WhatsApp.
 
 ## Custom domain (optional)
 
