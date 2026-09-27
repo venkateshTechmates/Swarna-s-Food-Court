@@ -1,6 +1,14 @@
 # Swarna's Food Court — website
 
-One file, no build step: `index.html` holds the menu, prices (₹), WhatsApp ordering and the "Find us" section.
+A static site with no server and no build step. `index.html` holds the menu, prices (₹), WhatsApp ordering and the "Find us" section. Orders are not stored anywhere; they are sent to the shop as a WhatsApp message.
+
+| File | Purpose |
+|---|---|
+| `index.html` | The whole site |
+| `images/` | Dish photos, app icons and the share preview banner |
+| `404.html` | Shown for a wrong link, points back to the menu |
+| `manifest.webmanifest` | Lets customers add the site to their phone home screen |
+| `sitemap.xml` | For Google Search Console |
 
 **Live site:** https://venkateshtechmates.github.io/Swarna-s-Food-Court/
 
@@ -53,6 +61,12 @@ Edit the `MENU` array in the same `<script>`. Each dish is one line:
 ## Photos
 
 The dish photos in `images/` were cropped from the shop's two posters. `images/banner.jpg` is the preview picture shown when the link is shared on WhatsApp.
+
+## Get found on Google (optional)
+
+1. Open https://search.google.com/search-console and add the site address as a URL-prefix property.
+2. Verify it, then submit `sitemap.xml` under **Sitemaps**.
+3. Also claim the shop on Google Business Profile and put the site address in it.
 
 ## Custom domain (optional)
 

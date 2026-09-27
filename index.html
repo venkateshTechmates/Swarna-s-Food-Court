@@ -11,12 +11,13 @@
 <meta property="og:image" content="https://venkateshtechmates.github.io/Swarna-s-Food-Court/images/banner.jpg">
 <meta property="og:description" content="Dum biryani, fried rice, noodles and crispy starters from ₹20. Opposite MANA Hospital, Gajularamaram.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23C61B2E'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23F5B400' font-family='Georgia,serif' font-weight='700'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="canonical" href="https://venkateshtechmates.github.io/Swarna-s-Food-Court/">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<meta property="og:url" content="https://venkateshtechmates.github.io/Swarna-s-Food-Court/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Hind:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Restaurant","name":"Swarna's Food Court","telephone":["+919959819651","+919000849023"],"email":"swornarojesh@gmail.com","servesCuisine":["Indian","Hyderabadi","Indo-Chinese"],"priceRange":"₹20–₹120","currenciesAccepted":"INR","address":{"@type":"PostalAddress","streetAddress":"Opposite MANA Hospital, Mahadevapuram","addressLocality":"Gajularamaram, Hyderabad","addressRegion":"Telangana","addressCountry":"IN"}}
-</script>
 <style>
 :root{
   --red:#C61B2E; --red-deep:#9E1424;
@@ -556,6 +557,21 @@ footer{padding:22px 0 30px;color:var(--muted);font-size:.88rem;border-top:1px so
     const t = $("#toast"); t.textContent = msg; t.classList.add("show");
     clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
   }
+
+  /* Search engines: publish the menu and prices from MENU as structured data */
+  const ld = document.createElement("script");
+  ld.type = "application/ld+json";
+  ld.textContent = JSON.stringify({
+    "@context": "https://schema.org", "@type": "Restaurant", name: CONFIG.name,
+    url: location.href.split("#")[0], telephone: CONFIG.phones, email: CONFIG.email,
+    image: new URL("images/banner.jpg", location.href).href,
+    servesCuisine: ["Indian", "Hyderabadi", "Indo-Chinese"], priceRange: "₹20–₹120",
+    address: { "@type": "PostalAddress", streetAddress: "Opposite MANA Hospital, Mahadevapuram", addressLocality: "Gajularamaram, Hyderabad", addressRegion: "Telangana", addressCountry: "IN" },
+    hasMenu: { "@type": "Menu", hasMenuSection: MENU.map((c) => ({ "@type": "MenuSection", name: c.name,
+      hasMenuItem: c.items.map((i) => Object.assign({ "@type": "MenuItem", name: i.name, description: i.desc },
+        i.price == null ? {} : { offers: { "@type": "Offer", price: String(i.price), priceCurrency: "INR" } })) })) }
+  });
+  document.head.appendChild(ld);
 
   renderMenu();
   renderCart();
