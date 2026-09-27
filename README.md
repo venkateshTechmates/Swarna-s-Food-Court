@@ -44,9 +44,9 @@ Edit the `MENU` array in the same `<script>`. Each dish is one line:
 { id: "cdb", name: "Chicken Dum Biryani", price: 120, veg: false, img: "biryani", desc: "…" }
 ```
 
-- `price` is in rupees.
+- `price` is in rupees. `price: null` shows "Ask price"; the dish can still be ordered and the WhatsApp message says "price at counter". Chicken Lollipop and Tandoori Chicken are set this way until their prices are filled in.
 - `veg: true` shows the green vegetarian mark; `false` shows the non-veg mark.
-- `img` picks the dish photo from the `images/` folder: biryani, friedrice_c, friedrice_v, noodles_c, noodles_v, manchuria, chicken65, kebab, pakodi, fish, boneless, roti.
+- `img` picks the dish photo from the `images/` folder: biryani, friedrice_c, friedrice_v, noodles_c, noodles_v, manchuria, chicken65, kebab, pakodi, lollipop, tandoori, fish, boneless, roti.
 - To use a different photo, upload it to `images/` and add `photo: "images/my-photo.jpg"` to the dish.
 - To add a category, add a new `{ name: "…", items: [ … ] }` block.
 

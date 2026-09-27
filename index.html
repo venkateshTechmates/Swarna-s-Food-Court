@@ -216,7 +216,7 @@ footer{padding:22px 0 30px;color:var(--muted);font-size:.88rem;border-top:1px so
     <div class="wrap">
       <div class="menu-head">
         <h2 id="menuTitle">Menu</h2>
-        <p id="menuIntro">Fifteen dishes from ₹20 to ₹120. Tap Add to build your order.</p>
+        <p id="menuIntro">Dishes from ₹20 to ₹120. Tap Add to build your order.</p>
       </div>
       <div class="finder" id="finder">
         <div class="finder-row">
@@ -318,7 +318,9 @@ footer{padding:22px 0 30px;color:var(--muted);font-size:.88rem;border-top:1px so
     { name: "Starters", items: [
       { id: "c65", name: "Chicken 65", price: 100, veg: false, img: "chicken65", desc: "Deep-fried chicken bites with curry leaves and chilli." },
       { id: "ckb", name: "Chicken Kebab", price: 100, veg: false, img: "kebab", desc: "Marinated chicken, char-grilled on skewers." },
-      { id: "cpk", name: "Chicken Pakodi", price: 100, veg: false, img: "pakodi", desc: "Crisp chicken fritters, Andhra style." }
+      { id: "cpk", name: "Chicken Pakodi", price: 100, veg: false, img: "pakodi", desc: "Crisp chicken fritters, Andhra style." },
+      { id: "clp", name: "Chicken Lollipop", price: null, veg: false, img: "lollipop", desc: "Frenched chicken wings, spiced and fried crisp." },   // price: null shows "Ask price". Put the number here when known.
+      { id: "tch", name: "Tandoori Chicken", price: null, veg: false, img: "tandoori", desc: "Chicken marinated in yogurt and spices, roasted in the tandoor." }
     ]},
     { name: "Fish", items: [
       { id: "ffr", name: "Fish Fry", price: 100, veg: false, img: "fish", desc: "Whole fish marinated in masala and fried crisp." },
@@ -332,8 +334,8 @@ footer{padding:22px 0 30px;color:var(--muted);font-size:.88rem;border-top:1px so
   /* Dish photos (in the images folder). A dish can override with photo: "images/xyz.jpg".
      If a photo is missing, the icon on a coloured plate below is shown instead. */
   const PHOTO = {
-    biryani: "biryani", friedrice_c: "friedrice", friedrice_v: "friedrice",
-    noodles_c: "noodles", noodles_v: "noodles", manchuria: "manchuria",
+    biryani: "biryani", friedrice_c: "friedrice_c", friedrice_v: "friedrice",
+    noodles_c: "noodles_c", noodles_v: "noodles", lollipop: "lollipop", tandoori: "tandoori", manchuria: "manchuria",
     chicken65: "chicken65", kebab: "kebab", pakodi: "pakodi",
     fish: "fish", boneless: "fish", roti: "roti"
   };
@@ -347,13 +349,15 @@ footer{padding:22px 0 30px;color:var(--muted);font-size:.88rem;border-top:1px so
     chicken65:   { icon: "🍗", bg: "#F7CFC4" },
     kebab:       { icon: "🍢", bg: "#F3D9BF" },
     pakodi:      { icon: "🍤", bg: "#F8E2B8" },
+    lollipop:    { icon: "🍗", bg: "#F7CFC4" },
+    tandoori:    { icon: "🍢", bg: "#F3D9BF" },
     fish:        { icon: "🐟", bg: "#D6E8F2" },
     boneless:    { icon: "🐠", bg: "#D6E8F2" },
     roti:        { icon: "🫓", bg: "#F3E6CF" }
   };
 
   const $ = (s) => document.querySelector(s);
-  const money = (n) => CONFIG.currency + n.toLocaleString("en-IN");
+  const money = (n) => (n == null ? "Ask price" : CONFIG.currency + n.toLocaleString("en-IN"));
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const ALL = MENU.flatMap((c) => c.items.map((i) => ({ ...i, cat: c.name })));
   const byId = Object.fromEntries(ALL.map((i) => [i.id, i]));
@@ -413,7 +417,8 @@ footer{padding:22px 0 30px;color:var(--muted);font-size:.88rem;border-top:1px so
         (!q || (it.name + " " + c.name + " " + it.desc + (it.egg ? " egg" : "") + (it.veg ? " veg" : " non-veg")).toLowerCase().includes(q)));
       if (!items.length) return "";
       shown += items.length;
-      const lo = Math.min(...items.map((i) => i.price)), hi = Math.max(...items.map((i) => i.price));
+      const priced = items.map((i) => i.price).filter((n) => n != null);
+      const lo = priced.length ? Math.min(...priced) : null, hi = priced.length ? Math.max(...priced) : null;
       return '<section class="cat" id="' + slug(c.name) + '"><div class="cat-head"><h3>' + esc(c.name) + "</h3><span>" + (lo === hi ? money(lo) : money(lo) + "–" + money(hi)) + '</span></div><ul class="dishes">' +
         items.map((it) => '<li class="dish" data-id="' + it.id + '"><div><p class="dish-name">' + mark(it) + esc(it.name) + '</p><p class="dish-price">' + money(it.price) + '</p><p class="dish-desc">' + esc(it.desc) + '</p></div><div class="dish-media">' + art(it) + '<span class="ctl">' + control(it) + "</span></div></li>").join("") +
         "</ul></section>";
@@ -443,26 +448,28 @@ footer{padding:22px 0 30px;color:var(--muted);font-size:.88rem;border-top:1px so
 
   /* ---------- Cart ---------- */
   const count = () => Object.values(cart).reduce((a, b) => a + b, 0);
-  const total = () => Object.entries(cart).reduce((a, [id, q]) => a + byId[id].price * q, 0);
+  const total = () => Object.entries(cart).reduce((a, [id, q]) => a + (byId[id].price || 0) * q, 0);
+  const unpriced = () => Object.keys(cart).some((id) => byId[id].price == null);
+  const totalText = () => money(total()) + (unpriced() ? " + items priced at counter" : "");
 
   function orderText() {
-    const lines = ALL.filter((i) => cart[i.id]).map((i) => cart[i.id] + " x " + i.name + " = " + money(i.price * cart[i.id]));
+    const lines = ALL.filter((i) => cart[i.id]).map((i) => cart[i.id] + " x " + i.name + " = " + (i.price == null ? "price at counter" : money(i.price * cart[i.id])));
     const note = $("#note").value.trim();
-    return "Hi " + CONFIG.name + ", I'd like to order:\n\n" + lines.join("\n") + "\n\nTotal: " + money(total()) + (note ? "\n\nNote: " + note : "");
+    return "Hi " + CONFIG.name + ", I'd like to order:\n\n" + lines.join("\n") + "\n\nTotal: " + totalText() + (note ? "\n\nNote: " + note : "");
   }
 
   function renderCart() {
     const n = count();
     $("#cartCount").textContent = n + (n === 1 ? " item" : " items");
-    $("#cartTotal").textContent = money(total());
+    $("#cartTotal").textContent = money(total()) + (unpriced() ? " +" : "");
     $("#cartbar").classList.toggle("show", n > 0);
     document.body.classList.toggle("has-cart", n > 0);
     const items = ALL.filter((i) => cart[i.id]);
     $("#orderList").innerHTML = items.map((i) =>
-      '<li class="order-item"><div><div class="name">' + mark(i) + esc(i.name) + '</div><div class="each">' + money(i.price) + ' each</div></div><div class="stepper"><button type="button" data-dec="' + i.id + '" aria-label="Remove one ' + esc(i.name) + '">−</button><output>' + cart[i.id] + '</output><button type="button" data-inc="' + i.id + '" aria-label="Add one more ' + esc(i.name) + '">+</button></div><div class="order-line">' + money(i.price * cart[i.id]) + "</div></li>").join("");
+      '<li class="order-item"><div><div class="name">' + mark(i) + esc(i.name) + '</div><div class="each">' + (i.price == null ? "Price at counter" : money(i.price) + " each") + '</div></div><div class="stepper"><button type="button" data-dec="' + i.id + '" aria-label="Remove one ' + esc(i.name) + '">−</button><output>' + cart[i.id] + '</output><button type="button" data-inc="' + i.id + '" aria-label="Add one more ' + esc(i.name) + '">+</button></div><div class="order-line">' + (i.price == null ? "Ask" : money(i.price * cart[i.id])) + "</div></li>").join("");
     $("#orderEmpty").hidden = n > 0;
     $("#orderTotalRow").hidden = n === 0;
-    $("#orderTotal").textContent = money(total());
+    $("#orderTotal").textContent = totalText();
     const send = $("#sendOrder");
     send.setAttribute("aria-disabled", String(n === 0));
     send.style.opacity = n ? "" : ".5";
